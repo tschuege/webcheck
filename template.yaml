@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  webCheck
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  WebCheckFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Timeout: 10
+      Runtime: nodejs8.10
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          EMAIL: juergegli@gmail.com
+
+Outputs:
+
+  WebCheckFunction:
+    Description: "WebCheck Lambda Function ARN"
+    Value: !GetAtt WebCheckFunction.Arn
+
+  WebCheckFunctionIamRole:
+    Description: "Implicit IAM Role created for WebCheck function"
+    Value: !GetAtt WebCheckFunctionRole.Arn
