@@ -3,7 +3,7 @@ const {JSDOM} = jsdom;
 const fetch = require("node-fetch");
 const AWS = require('aws-sdk');
 const moment = require('moment');
-
+const diffMatchPatch = require('diff-match-patch-node');
 
 AWS.config.update({
     region: "eu-west-1"
@@ -22,7 +22,7 @@ exports.lambda_handler = async (event, context, callback) => {
 
         const pages = await getPagesToCheck();
 
-        console.log(`found active pages to check: ${pages.size}`);
+        console.log(`found active pages to check: ${pages.length}`);
 
         await pages.forEach(async (page) => {
 
@@ -37,9 +37,19 @@ exports.lambda_handler = async (event, context, callback) => {
 
             if (page.content !== newContent) {
 
+                // https://github.com/google/diff-match-patch/wiki/API
+
+                let changes = diffMatchPatch().diff_main(page.content, newContent);
+                diffMatchPatch().diff_cleanupSemantic(changes);
+
+                // real changes are only those with type != 0 and lenght of the changes is >=5
+                const realChanges = changes.filter((c) =>{
+                    return c.length === 2 && c[0] !== 0;
+                });
+
                 if (page.content) {
                     // send message!
-                    await sendNotification(page.name, page.url, page.content, newContent)
+                    await sendNotification(page.name, page.url, realChanges, page.content, newContent)
                 }
                 // save new content
                 await updatePageValue(page.name, newContent)
@@ -143,13 +153,28 @@ const updatePageValue = async function (name, newContent) {
     })
 };
 
-const sendNotification = async function (name, url, oldContent, newContent) {
+const sendNotification = async function (name, url, changes, oldContent, newContent) {
 
     console.log(`sending notification for site: ${name}, url: ${url}, oldContent: ${oldContent}, newContent: ${newContent}`);
+
+    let partChanges = '<ul>';
+    changes.forEach((change) => {
+
+        let color = change[0] === -1 ? 'red' : 'green';
+        let textDecoration = change[0] === -1 ? 'line-through': 'none';
+
+
+        console.log(`???> ${change}:${color}:${textDecoration}:${change[1]}`);
+
+
+        partChanges = `${partChanges}<li><span style="color: ${color}, text-decoration: ${textDecoration}">${change[1]}</span></li>`;
+    });
+    partChanges = `${partChanges}</ul>`;
 
     const textBody = `Name ${name}\nUrl: ${url}\nNew: ${newContent}\nOld: ${oldContent}`;
     const htmlBody = `<h1>Site ${name} changed</h1><table>
 <tr><td valign="top">Url</td><td>${url}</td></tr>
+<tr><td valign="top">Changes</td><td>${partChanges}</td></tr>
 <tr><td valign="top">New</td><td>${newContent}</td></tr>
 <tr><td valign="top">Old</td><td>${oldContent}</td></tr>
 </table>`;
