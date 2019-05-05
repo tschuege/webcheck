@@ -7,7 +7,7 @@ Globals:
     Timeout: 3
 Outputs:
   WebCheckFunction:
-    Description: Hello World Lambda Function ARN
+    Description: WebCheck Lambda Function ARN
     Value:
       Fn::GetAtt:
       - WebCheckFunction
@@ -21,7 +21,7 @@ Outputs:
 Resources:
   WebCheckFunction:
     Properties:
-      CodeUri: s3://tschuege-deployments/26c57a5bcb5871dbddffacc67ede11bf
+      CodeUri: s3://tschuege-deployments/4cd27f7a9529f16e2c513b376d5b90a1
       Environment:
         Variables:
           EMAIL: juergegli@gmail.com

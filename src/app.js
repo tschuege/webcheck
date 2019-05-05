@@ -39,13 +39,19 @@ exports.lambda_handler = async (event, context, callback) => {
 
                 // https://github.com/google/diff-match-patch/wiki/API
 
-                let changes = diffMatchPatch().diff_main(page.content, newContent);
-                diffMatchPatch().diff_cleanupSemantic(changes);
+                let realChanges = [];
+                try {
+                    let changes = diffMatchPatch().diff_main(page.content, newContent);
+                    diffMatchPatch().diff_cleanupSemantic(changes);
 
-                // real changes are only those with type != 0 and lenght of the changes is >=5
-                const realChanges = changes.filter((c) =>{
-                    return c.length === 2 && c[0] !== 0;
-                });
+                    // real changes are only those with type != 0 and length of the changes is >=5
+                    realChanges = changes.filter((c) => {
+                        return c.length === 2 && c[0] !== 0;
+                    });
+
+                } catch (err) {
+                    console.warn(`Error when evaluating real changes : ${err}`);
+                }
 
                 if (page.content) {
                     // send message!
@@ -60,8 +66,7 @@ exports.lambda_handler = async (event, context, callback) => {
         console.log(`check finished: ${new Date()}`);
 
         callback();
-    }
-    catch (err) {
+    } catch (err) {
         console.log(`Error: ${err}`);
         callback(err, null);
     }
@@ -161,13 +166,13 @@ const sendNotification = async function (name, url, changes, oldContent, newCont
     changes.forEach((change) => {
 
         let color = change[0] === -1 ? 'red' : 'green';
-        let textDecoration = change[0] === -1 ? 'line-through': 'none';
+        let textDecoration = change[0] === -1 ? 'line-through' : 'none';
 
 
         console.log(`???> ${change}:${color}:${textDecoration}:${change[1]}`);
 
 
-        partChanges = `${partChanges}<li><span style="color: ${color}, text-decoration: ${textDecoration}">${change[1]}</span></li>`;
+        partChanges = `${partChanges}<li><span style=\"color: ${color}, text-decoration: ${textDecoration}\">${change[1]}</span></li>`;
     });
     partChanges = `${partChanges}</ul>`;
 
