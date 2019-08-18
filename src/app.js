@@ -26,12 +26,14 @@ exports.lambda_handler = async (event, context, callback) => {
 
         await pages.forEach(async (page) => {
 
-            // const url = 'http://www.geho.ch/vermietung/freie_wohnungen';
-            // const selector = 'article';
-
             console.log(`getting content from ${page.url}`);
 
             const newContent = await getContent(page.url, page.selector);
+
+            if (!newContent) {
+                console.warn(`Could not get content for ${page.url} - ${page.selector}. Check the url and selector`);
+                return Promise.resolve()    ;
+            }
 
             console.log(`got content from ${page.url}: ${newContent}`);
 
@@ -59,6 +61,8 @@ exports.lambda_handler = async (event, context, callback) => {
                 }
                 // save new content
                 await updatePageValue(page.name, newContent)
+            } else {
+                console.debug(`No change detected for ${page.url}`);
             }
 
         });
@@ -75,14 +79,24 @@ exports.lambda_handler = async (event, context, callback) => {
 const getContent = async function (url, selector) {
 
     const response = await fetch(url);
-    const body = await response.text();
 
-    if (!selector) {
-        return body;
+    if (response) {
+        const body = await response.text();
+
+        if (!selector) {
+            return body;
+        }
+
+        const dom = new JSDOM(body);
+        const element = dom.window.document.querySelector(selector);
+        if (element) {
+            return dom.window.document.querySelector(selector).textContent;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
     }
-
-    const dom = new JSDOM(body);
-    return dom.window.document.querySelector(selector).textContent;
 };
 
 const getPagesToCheck = async function () {
@@ -162,54 +176,60 @@ const sendNotification = async function (name, url, changes, oldContent, newCont
 
     console.log(`sending notification for site: ${name}, url: ${url}, oldContent: ${oldContent}, newContent: ${newContent}`);
 
-    let partChanges = '<ul>';
-    changes.forEach((change) => {
+    try {
 
-        let color = change[0] === -1 ? 'red' : 'green';
-        let textDecoration = change[0] === -1 ? 'line-through' : 'none';
+        let partChanges = '<ul>';
+        changes.forEach((change) => {
+
+            let color = change[0] === -1 ? 'red' : 'green';
+            let textDecoration = change[0] === -1 ? 'line-through' : 'none';
 
 
-        console.log(`???> ${change}:${color}:${textDecoration}:${change[1]}`);
+            console.log(`???> ${change}:${color}:${textDecoration}:${change[1]}`);
 
 
-        partChanges = `${partChanges}<li><span style=\"color: ${color}, text-decoration: ${textDecoration}\">${change[1]}</span></li>`;
-    });
-    partChanges = `${partChanges}</ul>`;
+            partChanges = `${partChanges}<li><span style=\"color: ${color}, text-decoration: ${textDecoration}\">${change[1]}</span></li>`;
+        });
+        partChanges = `${partChanges}</ul>`;
 
-    const textBody = `Name ${name}\nUrl: ${url}\nNew: ${newContent}\nOld: ${oldContent}`;
-    const htmlBody = `<h1>Site ${name} changed</h1><table>
+        const textBody = `Name ${name}\nUrl: ${url}\nNew: ${newContent}\nOld: ${oldContent}`;
+        const htmlBody = `<h1>Site ${name} changed</h1><table>
 <tr><td valign="top">Url</td><td>${url}</td></tr>
 <tr><td valign="top">Changes</td><td>${partChanges}</td></tr>
 <tr><td valign="top">New</td><td>${newContent}</td></tr>
 <tr><td valign="top">Old</td><td>${oldContent}</td></tr>
 </table>`;
 
-    const mailParams = {
-        Destination: {
-            /* required */
-            ToAddresses: [email]
-        },
-        Message: {
-            /* required */
-            Body: {
+        const mailParams = {
+            Destination: {
                 /* required */
-                Html: {
-                    Charset: "UTF-8",
-                    Data: htmlBody
+                ToAddresses: [email]
+            },
+            Message: {
+                /* required */
+                Body: {
+                    /* required */
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: htmlBody
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: textBody
+                    }
                 },
-                Text: {
-                    Charset: "UTF-8",
-                    Data: textBody
+                Subject: {
+                    Charset: 'UTF-8',
+                    Data: `Web Check - Site changed ${name}`
                 }
             },
-            Subject: {
-                Charset: 'UTF-8',
-                Data: `Web Check - Site changed ${name}`
-            }
-        },
-        Source: email
-    };
+            Source: email
+        };
 
-    await snsClient.sendEmail(mailParams).promise();
+        await snsClient.sendEmail(mailParams).promise();
+    } catch (err) {
+        console.error(`Error when sending notification: ${err}`);
+    }
+
     console.log('message sent');
 };
