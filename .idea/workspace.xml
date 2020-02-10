@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f1f24da7-d1a5-441d-b155-8fca12796827" name="Default Changelist" comment="">
+    <list default="true" id="f1f24da7-d1a5-441d-b155-8fca12796827" name="Default Changelist" comment="[debug] added some debugging information&#10;&#10;hardly any mail received so I suspect an issue with sending mails">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packaged.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/packaged.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/package.json" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +19,11 @@
   </component>
   <component name="ProjectId" id="1PabbZHEOaqHORBdF87yefFxlky" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -24,17 +31,18 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
+  <component name="ServiceViewManager">
+    <option name="viewStates">
       <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
       </list>
     </option>
   </component>
@@ -54,7 +62,10 @@
       <workItem from="1535955395740" duration="595000" />
       <workItem from="1551038572491" duration="8514000" />
       <workItem from="1557048615744" duration="1500000" />
-      <workItem from="1566115228995" duration="1854000" />
+      <workItem from="1566115228995" duration="3381000" />
+      <workItem from="1566370405017" duration="859000" />
+      <workItem from="1566394955806" duration="82000" />
+      <workItem from="1581364549556" duration="4307000" />
     </task>
     <task id="LOCAL-00001" summary="[improve] try better highlight of changes">
       <created>1551045145482</created>
@@ -70,7 +81,14 @@
       <option name="project" value="LOCAL" />
       <updated>1557049470683</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="[debug] added some debugging information&#10;&#10;hardly any mail received so I suspect an issue with sending mails">
+      <created>1566117185428</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1566117185428</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -92,7 +110,26 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="[improve] try better highlight of changes" />
     <MESSAGE value="[fix] issue with some pages alerting change all the time&#10;&#10;might be because of exception while evaluating real changes preventing&#10;update of dynamo" />
-    <option name="LAST_COMMIT_MESSAGE" value="[fix] issue with some pages alerting change all the time&#10;&#10;might be because of exception while evaluating real changes preventing&#10;update of dynamo" />
+    <MESSAGE value="[debug] added some debugging information&#10;&#10;hardly any mail received so I suspect an issue with sending mails" />
+    <option name="LAST_COMMIT_MESSAGE" value="[debug] added some debugging information&#10;&#10;hardly any mail received so I suspect an issue with sending mails" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="403" y="121" key="CommitChangelistDialog2" timestamp="1581368921334">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="403" y="121" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1581368921334" />
+    <state x="100" y="123" width="1480" height="827" key="DiffContextDialog" timestamp="1581368861418">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="100" y="123" width="1480" height="827" key="DiffContextDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1581368861418" />
+    <state x="651" y="254" key="RollbackChangesDialog" timestamp="1581365574722">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="651" y="254" key="RollbackChangesDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1581365574722" />
+    <state x="623" y="460" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581364818779">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="623" y="460" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.23.1680.1027@0.23.1680.1027" timestamp="1581364818779" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -2,7 +2,7 @@ const jsdom = require("jsdom");
 const {JSDOM} = jsdom;
 const fetch = require("node-fetch");
 const AWS = require('aws-sdk');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const diffMatchPatch = require('diff-match-patch-node');
 
 AWS.config.update({
@@ -18,11 +18,11 @@ exports.lambda_handler = async (event, context, callback) => {
 
     try {
 
-        console.log(`check started: ${new Date()}`);
+        console.log(`check started with default hours ${event.defaultHours} at: ${new Date()}`);
 
-        const pages = await getPagesToCheck();
+        const pages = await getPagesToCheck(event.defaultHours);
 
-        console.log(`found active pages to check: ${pages.length}`);
+        console.log(`found active pages to check now: ${pages.length}`);
 
         await pages.forEach(async (page) => {
 
@@ -92,14 +92,16 @@ const getContent = async function (url, selector) {
         if (element) {
             return dom.window.document.querySelector(selector).textContent;
         } else {
+            console.log(`GetContent - could not apply selector ${url} - ${selector} on ${body}`);
             return null;
         }
     } else {
+        console.log(`GetContent - could not fetch url ${url}`);
         return null;
     }
 };
 
-const getPagesToCheck = async function () {
+const getPagesToCheck = async function (defaultHours) {
 
     console.log("Querying sites to check from dynamo DB");
 
@@ -124,9 +126,26 @@ const getPagesToCheck = async function () {
                 } else {
                     console.log("Query for sites succeeded.");
                     data.Items.forEach(function (item) {
-                        console.log(" -", item.name + ": " + item.url);
                     });
-                    resolve(data.Items)
+
+                    let now = moment().tz("Europe/Zurich");
+                    let cHour = parseInt(now.format('HH'));
+
+                    let result = data.Items.filter((item) => {
+                        // if hour is not set on the item, compare with the default hours passed in
+                        if (item.hours === undefined) {
+                            item.hours = defaultHours;
+                        }
+                        for (let i = 0; i < item.hours.length; i++) {
+                            if (cHour === item.hours[i]) {
+                                console.log(`check site ${item.url} because of current hour is ${cHour}`);
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+
+                    resolve(result)
                 }
             });
         } catch (err) {
@@ -164,7 +183,7 @@ const updatePageValue = async function (name, newContent) {
                 console.log(error);
                 reject(error);
             } else {
-                const msg = `UpdateItem succeeded:", ${JSON.stringify(data, null, 2)};`
+                const msg = `UpdateItem succeeded:", ${JSON.stringify(data, null, 2)}`;
                 console.log(msg);
                 resolve(msg);
             }

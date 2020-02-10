@@ -21,7 +21,7 @@ Outputs:
 Resources:
   WebCheckFunction:
     Properties:
-      CodeUri: s3://tschuege-deployments/04d985697a91b4c6d6e799854f6115fc
+      CodeUri: s3://tschuege-deployments/369d813071ca9e4031458249bc38234a
       Environment:
         Variables:
           EMAIL: juergegli@gmail.com
